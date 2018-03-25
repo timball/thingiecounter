@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <title>ThingCounter</title>
+</head>
+
+<body>
+  
+  <div id="ThingDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
+  <script>
+setTimeout(function(){
+   window.location.reload(1);
+}, 5000);
+
+function plotThings() {
+    var getUrl = window.location;
+    var baseUrl = getUrl.protocol + "//" + getUrl.host + getUrl.pathname.split('/')[1];
+    // alert(baseUrl);
+
+    var url= baseUrl + '/tally';
+
+    Plotly.d3.json(url, function(error, data) {
+      if (error) return console.warn(error);
+      var layout = {barmode: 'group'};
+      
+     Plotly.newPlot('ThingDiv', data.data, layout);
+    });
+}
+plotThings();
+  </script>
+</body>
+</html>
