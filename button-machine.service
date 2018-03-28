@@ -1,0 +1,10 @@
+[Unit]
+Description=Button Machine Service
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python /home/pi/thingiecounter/button-machine.py > /home/pi/thingiecounter/button.log 2>&1
+
+[Install]
+WantedBy=multi-user.target
