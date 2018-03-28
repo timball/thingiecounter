@@ -10,7 +10,6 @@
 import local_settings as conf
 from gpiozero import LED, PWMLED, Button
 from signal import pause
-from time import sleep
 
 # Base url for thingiecounter api
 URL = conf.URL
@@ -22,38 +21,9 @@ GRN_BTN = conf.GRN_BTN
 BLU_BTN = conf.BLU_BTN
 
 
-def put_dec(endpt):
-    """ @put_dec -- decorator that takes an argument
-
-    This is so that gpiozero Button.when_released can take
-    a function pointer.
-    endpt -- string you want ThingieCounter to count
-    """
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            import urllib2
-            import json
-
-            # print ("decorating function w/ arg: %s" % (endpt))
-            url = URL + endpt
-            opener = urllib2.build_opener(urllib2.HTTPHandler)
-            request = urllib2.Request(url)
-            request.add_header('Content-Type', 'application/json')
-            request.get_method = lambda: 'PUT'
-            try:
-                url = opener.open(request)
-            except urllib.error.URLError as e:
-                print("PUT %s URLError, reason: %s" % (url, e.reason))
-            except urllib.error.HTTPError as e:
-                print("HTTPError PUT %s == %s" % (url, e.code))
-
-            func(*args, **kwargs)
-        return wrapper
-    return decorator
-
-
 def put_curry(endpt):
     """ put_curry -- curry function to make the .when_released even easier
+    than a decorator that takes a mostly empty function
 
     endpt -- end point we want to inc in ThingieCounter
     """
@@ -79,23 +49,6 @@ def put_curry(endpt):
 red = put_curry("red")
 green = put_curry("green")
 blue = put_curry("blue")
-"""
-# XXX is there a better way to do this than this?
-@put_dec('red')
-def red():
-    True
-
-
-@put_dec('green')
-def green():
-    True
-
-
-@put_dec('blue')
-def blue():
-    True
-"""
-
 
 if __name__ == "__main__":
     pink_led = PWMLED(PNK_LED)
