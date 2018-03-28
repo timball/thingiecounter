@@ -52,6 +52,34 @@ def put_dec(endpt):
     return decorator
 
 
+def put_curry(endpt):
+    """ put_curry -- curry function to make the .when_released even easier
+
+    endpt -- end point we want to inc in ThingieCounter
+    """
+    def curry():
+        import urllib2
+        import json
+
+        # print ("decorating function w/ arg: %s" % (endpt))
+        url = URL + endpt
+        opener = urllib2.build_opener(urllib2.HTTPHandler)
+        request = urllib2.Request(url)
+        request.add_header('Content-Type', 'application/json')
+        request.get_method = lambda: 'PUT'
+        try:
+            url = opener.open(request)
+        except urllib.error.URLError as e:
+            print("PUT %s URLError, reason: %s" % (url, e.reason))
+        except urllib.error.HTTPError as e:
+            print("HTTPError PUT %s == %s" % (url, e.code))
+    return curry
+
+
+red = put_curry("red")
+green = put_curry("green")
+blue = put_curry("blue")
+"""
 # XXX is there a better way to do this than this?
 @put_dec('red')
 def red():
@@ -66,6 +94,7 @@ def green():
 @put_dec('blue')
 def blue():
     True
+"""
 
 
 if __name__ == "__main__":
