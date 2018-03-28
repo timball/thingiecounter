@@ -16,10 +16,10 @@ from time import sleep
 URL = conf.URL
 
 # These correspond to RPi pins BE VERY CAREFUL HERE!
-PNK_LED = 24
-RED_BTN = 15
-GRN_BTN = 18
-BLU_BTN = 23
+PNK_LED = conf.PNK_LED
+RED_BTN = conf.RED_BTN
+GRN_BTN = conf.GRN_BTN
+BLU_BTN = conf.BLU_BTN
 
 
 def put_dec(endpt):

@@ -1,0 +1,8 @@
+# the url running ThingieCounter
+URL = "https://some-host-running/thingie/"
+
+# the below should be just integers corresponding to your RPi pin layout for your hookups
+PNK_LED = RPi_PIN_24
+RED_BTN = RPi_PIN_15
+GRN_BTN = RPi_PIN_18
+BLU_BTN = RPi_PIN_23
