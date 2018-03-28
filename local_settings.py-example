@@ -1,6 +1,9 @@
 # the url running ThingieCounter
 URL = "https://some-host-running/thingie/"
 
+# where the sqlite db is
+DBFILE = "thingie.sqlite"
+
 # the below should be just integers corresponding to your RPi pin layout for your hookups
 PNK_LED = RPi_PIN_24
 RED_BTN = RPi_PIN_15
