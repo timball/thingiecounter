@@ -102,5 +102,6 @@ ENV/
 .mypy_cache/
 
 # project specific
+local_settings.py
 thingie.sqlite
 *.swp
