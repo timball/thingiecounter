@@ -105,3 +105,4 @@ ENV/
 local_settings.py
 thingie.sqlite
 *.swp
+*_test.py

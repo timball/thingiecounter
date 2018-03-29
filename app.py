@@ -6,7 +6,7 @@ import os
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, confi.DBFILE)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, conf.DBFILE)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -62,6 +62,7 @@ def hello():
 
 @app.route("/tallymebanana", methods=["GET"])
 def tallybanana():
+    """ tallybanana -- this just returns json of what's in the db no processing """
     all_the_things = ThingCounter.query.all()
     result = things_schema.dump(all_the_things)
     return jsonify(result.data)
@@ -69,6 +70,7 @@ def tallybanana():
 
 @app.route("/tally", methods=["GET"])
 def tally():
+    """ tally -- returns a json that graph lib can deal with """
     all_the_things = ThingCounter.query.all()
     result = things_schema.dump(all_the_things)
     names = list()
@@ -83,6 +85,7 @@ def tally():
 
 @app.route("/<thing>", methods=["PUT"])
 def inc_thing(thing):
+    """ inc_thing -- this incriments a thing's counter or sets it to 1 if thing doesn't exist """
     thing = ''.join([*filter(str.isalnum, thing)])
     q = db.session.query(ThingCounter)
     r = q.filter(ThingCounter.name == thing)
@@ -107,8 +110,64 @@ def inc_thing(thing):
     return thing_schema.jsonify(thing)
 
 
+@app.route("/<thing>", methods=["DELETE"])
+def rm_thing(thing):
+    """ rm_thing -- deletes a thing from the database """
+    thing = ''.join([*filter(str.isalnum, thing)])
+    auth = request.headers.get(conf.AUTH_HDR)
+
+    if (auth is conf.AUTH_HDR):
+        raise APIError('Say ‘friend’ and enter.', status_code=401)
+    else:
+        q = db.session.query(ThingCounter)
+        r = q.filter(ThingCounter.name == thing)
+
+        if r.count() == 1:
+            id = r.all()[0].id
+            thing = ThingCounter.query.get(id)
+            db.session.delete(thing)
+            db.session.commit()
+
+        elif r.count() == 0:
+            True
+            # do nothing explicitly
+
+        else:
+            raise APIError('number of things name %s:%d is neither {0,1}' % (thing, r.count()), status_code=520)
+
+    return jsonify("Gwaem")
+
+
+@app.route("/<thing>", methods=["PURGE"])
+def purge_thing(thing):
+    """ purge_thing -- resets thing's counter to 0 """
+    thing = ''.join([*filter(str.isalnum, thing)])
+    auth = request.headers.get(conf.AUTH_HDR)
+
+    if (auth is conf.AUTH_HDR):
+        raise APIError('Say ‘friend’ and enter.', status_code=401)
+    else:
+        q = db.session.query(ThingCounter)
+        r = q.filter(ThingCounter.name == thing)
+
+        if r.count() == 1:
+            id = r.all()[0].id
+            thing = ThingCounter.query.get(id)
+            thing.count = 0
+            db.session.commit()
+
+        elif r.count() == 0:
+            True
+            # do nothing explicitly
+
+        else:
+            raise APIError('number of things name %s:%d is neither {0,1}' % (thing, r.count()), status_code=520)
+    return jsonify("Navaer")
+
+
 @app.route("/new", methods=["POST"])
 def new_thing():
+    """ new_thing() -- mostly unneeded way to create a new thing to count """
     name = request.json['name']
 
     new_thing = ThingCounter(name)
@@ -120,4 +179,4 @@ def new_thing():
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
