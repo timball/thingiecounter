@@ -63,7 +63,7 @@ if __name__ == "__main__":
     blu_button = Button(BLU_BTN)
     blu_button.when_released = blue
 
-    print ("ready!")
+    print("ready!")
     pink_led.pulse()
 
     pause()
