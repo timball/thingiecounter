@@ -44,9 +44,9 @@ if __name__ == "__main__":
     led = PWMLED(conf.LED_PIN)
     led.blink()
 
-    for button in conf.BTNS:
-        button.button = Button(button['PIN'])
-        button.button.when_released = put_curry(button['LABEL'])
+    for this in conf.BTNS:
+        this.button = Button(this['PIN'])
+        this.button.when_released = put_curry(this['LABEL'])
 
     print("ready!")
     led.pulse()
