@@ -44,6 +44,7 @@ if __name__ == "__main__":
     led = PWMLED(conf.LED_PIN)
     led.blink()
 
+    # each item in conf.BTNS[] is an individual button setting
     for this in conf.BTNS:
         this.button = Button(this['PIN'])
         this.button.when_released = put_curry(this['LABEL'])
