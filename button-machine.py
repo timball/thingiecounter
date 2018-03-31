@@ -14,12 +14,6 @@ from signal import pause
 # Base url for thingiecounter api
 URL = conf.URL
 
-# These correspond to RPi pins BE VERY CAREFUL HERE!
-PNK_LED = conf.PNK_LED
-RED_BTN = conf.RED_BTN
-GRN_BTN = conf.GRN_BTN
-BLU_BTN = conf.BLU_BTN
-
 
 def put_curry(endpt):
     """ put_curry -- curry function to make the .when_released even easier
@@ -46,24 +40,15 @@ def put_curry(endpt):
     return curry
 
 
-red = put_curry("red")
-green = put_curry("green")
-blue = put_curry("blue")
-
 if __name__ == "__main__":
-    pink_led = PWMLED(PNK_LED)
-    pink_led.value = 1
+    led = PWMLED(conf.LED_PIN)
+    led.blink()
 
-    red_button = Button(RED_BTN)
-    red_button.when_released = red
-
-    grn_button = Button(GRN_BTN)
-    grn_button.when_released = green
-
-    blu_button = Button(BLU_BTN)
-    blu_button.when_released = blue
+    for button in conf.BTNS:
+        button.button = Button(button['PIN'])
+        button.button.when_released = put_curry(button['LABEL'])
 
     print("ready!")
-    pink_led.pulse()
+    led.pulse()
 
     pause()

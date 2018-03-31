@@ -1,11 +1,17 @@
 # the url running ThingieCounter
 URL = "https://some-host-running/thingie/"
 
+# auth header name
+AUTH_HDR = "change-me-super-custom-auth-header-name-change-me"
+
+# auth header sekrit -- change this or everyone will laugh at you
+AUTH_SEKRIT = "imalittleteapotshortandstouthereismyhandleandhereismyspout"
+
 # where the sqlite db is
 DBFILE = "thingie.sqlite"
 
-# the below should be just integers corresponding to your RPi pin layout for your hookups
-PNK_LED = RPi_PIN_24
-RED_BTN = RPi_PIN_15
-GRN_BTN = RPi_PIN_18
-BLU_BTN = RPi_PIN_23
+# PIN   -- the RPi pin a button is conntected too
+# LABEL -- the string ThingieCounter counts
+BTNS = [{'PIN': 15, 'LABEL': 'happy'},
+        {'PIN': 18, 'LABEL': 'meh'},
+        {'PIN': 23, 'LABEL': 'sad'}]
