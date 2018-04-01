@@ -129,18 +129,5 @@ def manipulate_thingie(thing):
     return ret
 
 
-@app.route("/new", methods=["POST"])
-def new_thing():
-    """ new_thing() -- mostly unneeded way to create a new thing to count """
-    name = request.json['name']
-
-    new_thing = ThingCounter(name)
-
-    db.session.add(new_thing)
-    db.session.commit()
-
-    return thing_schema.jsonify(new_thing)
-
-
 if __name__ == '__main__':
     app.run(debug=True)
