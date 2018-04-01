@@ -15,3 +15,4 @@ DBFILE = "thingie.sqlite"
 BTNS = [{'PIN': 15, 'LABEL': 'happy'},
         {'PIN': 18, 'LABEL': 'meh'},
         {'PIN': 23, 'LABEL': 'sad'}]
+# vim: filetype=python
