@@ -9,3 +9,4 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
+# vim: set filetype=systemd
