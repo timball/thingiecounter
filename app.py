@@ -83,79 +83,50 @@ def tally():
     return jsonify(ans)
 
 
-@app.route("/<thing>", methods=["PUT"])
-def inc_thing(thing):
-    """ inc_thing -- this incriments a thing's counter or sets it to 1 if thing doesn't exist """
-    thing = ''.join([*filter(str.isalnum, thing)])
-    q = db.session.query(ThingCounter)
-    r = q.filter(ThingCounter.name == thing)
-    method = request.method
-
-    manipulate_thingie(method, thing)
-
-    return thing_schema.jsonify(thing)
-
-
-@app.route("/<thing>", methods=["DELETE"])
-def rm_thing(thing):
-    """ rm_thing -- deletes a thing from the database """
-    thing = ''.join([*filter(str.isalnum, thing)])
-    auth = request.headers.get(conf.AUTH_HDR)
-
-    if (auth is conf.AUTH_HDR):
-        raise APIError('Say ‘friend’ and enter.', status_code=401)
-    else:
-        manipulate_thingie(method, thing)
-
-    return jsonify("Gwaem")
-
-
-@app.route("/<thing>", methods=["PURGE"])
-def purge_thing(thing):
-    """ purge_thing -- resets thing's counter to 0 """
-    thing = ''.join([*filter(str.isalnum, thing)])
-    auth = request.headers.get(conf.AUTH_HDR)
-    method = request.method
-
-    if (auth is conf.AUTH_HDR):
-        raise APIError('Say ‘friend’ and enter.', status_code=401)
-    else:
-        manipulate_thingie(method, thing)
-    return jsonify("Navaer")
-
-
-def manipulate_thingie(method, thing):
+@app.route("/<thing>", methods=["PUT", "DELETE", "PURGE"])
+def manipulate_thingie(thing):
     """ manipulate_thingie -- either deletes an object from DB; sets it's count=0; or count += 1 depending on request.method """
+    thing = ''.join([*filter(str.isalnum, thing)])
     q = db.session.query(ThingCounter)
     r = q.filter(ThingCounter.name == thing)
+    ret = None
 
     if r.count() == 1:
+        # if method is PURGE or DELETE this ... uh still happens.
         id = r.all()[0].id
         thing = ThingCounter.query.get(id)
         count = r.all()[0].count
 
-        if (method == "PURGE"):
+        if (request.method == "PURGE"):
             thing.count = 0
-        elif (method == "DELETE"):
+        elif (request.method == "DELETE"):
             db.session.delete(thing)
-        elif (method == "PUT"):
+        elif (request.method == "PUT"):
             thing.count = count + 1
         else:
             APIError('unallowed method', status_code=400)
-
         db.session.commit()
+        ret = thing_schema.jsonify(thing)
 
     elif r.count() == 0:
-        if (method == "PUT"):
+        if (request.method == "PUT"):
             thing = ThingCounter(thing)
             db.session.add(thing)
             thing.count += 1
+            db.session.commit()
+            ret = thing_schema.jsonify(thing)
+        elif (request.method == "PURGE"):
+            raise APIError("%s does not exist to PURGE" % (thing), status_code=409)
+        elif (request.method == "DELETE"):
+            raise APIError("%s does not exist to DELETE" % (thing), status_code=409)
         else:
             # do nothing explicitly
-            True
+            raise APIError("%s doesn't make sense for %s" % (thing, request.method), status_code=409)
 
     else:
         raise APIError('number of things name %s:%d is neither {0,1}' % (thing, r.count()), status_code=520)
+
+    return ret
 
 
 @app.route("/new", methods=["POST"])
