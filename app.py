@@ -89,24 +89,10 @@ def inc_thing(thing):
     thing = ''.join([*filter(str.isalnum, thing)])
     q = db.session.query(ThingCounter)
     r = q.filter(ThingCounter.name == thing)
+    method = request.method
 
-    if r.count() == 1:
-        id = r.all()[0].id
-        count = r.all()[0].count
-        name = r.all()[0].name
-        thing = ThingCounter.query.get(id)
-        thing.name = name
-        thing.count = count + 1
+    manipulate_thingie(method, thing)
 
-    elif r.count() == 0:
-        thing = ThingCounter(thing)
-        db.session.add(thing)
-        thing.count += 1
-
-    else:
-        raise APIError('number of things name %s:%d is neither {0,1}' % (thing, r.count()), status_code=520)
-
-    db.session.commit()
     return thing_schema.jsonify(thing)
 
 
@@ -119,21 +105,7 @@ def rm_thing(thing):
     if (auth is conf.AUTH_HDR):
         raise APIError('Say ‘friend’ and enter.', status_code=401)
     else:
-        q = db.session.query(ThingCounter)
-        r = q.filter(ThingCounter.name == thing)
-
-        if r.count() == 1:
-            id = r.all()[0].id
-            thing = ThingCounter.query.get(id)
-            db.session.delete(thing)
-            db.session.commit()
-
-        elif r.count() == 0:
-            True
-            # do nothing explicitly
-
-        else:
-            raise APIError('number of things name %s:%d is neither {0,1}' % (thing, r.count()), status_code=520)
+        manipulate_thingie(method, thing)
 
     return jsonify("Gwaem")
 
@@ -143,26 +115,47 @@ def purge_thing(thing):
     """ purge_thing -- resets thing's counter to 0 """
     thing = ''.join([*filter(str.isalnum, thing)])
     auth = request.headers.get(conf.AUTH_HDR)
+    method = request.method
 
     if (auth is conf.AUTH_HDR):
         raise APIError('Say ‘friend’ and enter.', status_code=401)
     else:
-        q = db.session.query(ThingCounter)
-        r = q.filter(ThingCounter.name == thing)
-
-        if r.count() == 1:
-            id = r.all()[0].id
-            thing = ThingCounter.query.get(id)
-            thing.count = 0
-            db.session.commit()
-
-        elif r.count() == 0:
-            True
-            # do nothing explicitly
-
-        else:
-            raise APIError('number of things name %s:%d is neither {0,1}' % (thing, r.count()), status_code=520)
+        manipulate_thingie(method, thing)
     return jsonify("Navaer")
+
+
+def manipulate_thingie(method, thing):
+    """ manipulate_thingie -- either deletes an object from DB; sets it's count=0; or count += 1 depending on request.method """
+    q = db.session.query(ThingCounter)
+    r = q.filter(ThingCounter.name == thing)
+
+    if r.count() == 1:
+        id = r.all()[0].id
+        thing = ThingCounter.query.get(id)
+        count = r.all()[0].count
+
+        if (method == "PURGE"):
+            thing.count = 0
+        elif (method == "DELETE"):
+            db.session.delete(thing)
+        elif (method == "PUT"):
+            thing.count = count + 1
+        else:
+            APIError('unallowed method', status_code=400)
+
+        db.session.commit()
+
+    elif r.count() == 0:
+        if (method == "PUT"):
+            thing = ThingCounter(thing)
+            db.session.add(thing)
+            thing.count += 1
+        else:
+            # do nothing explicitly
+            True
+
+    else:
+        raise APIError('number of things name %s:%d is neither {0,1}' % (thing, r.count()), status_code=520)
 
 
 @app.route("/new", methods=["POST"])
