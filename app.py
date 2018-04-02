@@ -92,7 +92,7 @@ def manipulate_thingie(thing):
         depending on request.method
         silently cuts off <thing> at conf.MAX_THINGIE_NAME_LENGTH bc i'm a bastard """
     thing = ''.join([*filter(str.isalnum, thing)])
-    thing = things[:conf.MAX_THINGIE_NAME_LENGTH]
+    thing = thing[:conf.MAX_THINGIE_NAME_LENGTH]
     q = db.session.query(ThingCounter)
     r = q.filter(ThingCounter.name == thing)
     ret = None
