@@ -115,10 +115,8 @@ def manipulate_thingie(thing):
             thing.count += 1
             db.session.commit()
             ret = thing_schema.jsonify(thing)
-        elif (request.method == "PURGE"):
-            raise APIError("%s does not exist to PURGE" % (thing), status_code=409)
-        elif (request.method == "DELETE"):
-            raise APIError("%s does not exist to DELETE" % (thing), status_code=409)
+        elif (request.method == "PURGE" or request.method == "DELETE"):
+            raise APIError("%s does not exist to %s" % (thing, request.method), status_code=409)
         else:
             # do nothing explicitly
             raise APIError("%s doesn't make sense for %s" % (thing, request.method), status_code=409)
