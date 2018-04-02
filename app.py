@@ -92,7 +92,6 @@ def manipulate_thingie(thing):
     ret = None
 
     if r.count() == 1:
-        # if method is PURGE or DELETE this ... uh still happens.
         id = r.all()[0].id
         thing = ThingCounter.query.get(id)
         count = r.all()[0].count
@@ -104,7 +103,7 @@ def manipulate_thingie(thing):
         elif (request.method == "PUT"):
             thing.count = count + 1
         else:
-            APIError('unallowed method', status_code=400)
+            raise APIError('unallowed method: %s' % (request.method), status_code=400)
         db.session.commit()
         ret = thing_schema.jsonify(thing)
 
@@ -118,7 +117,6 @@ def manipulate_thingie(thing):
         elif (request.method == "PURGE" or request.method == "DELETE"):
             raise APIError("%s does not exist to %s" % (thing, request.method), status_code=409)
         else:
-            # do nothing explicitly
             raise APIError("%s doesn't make sense for %s" % (thing, request.method), status_code=409)
 
     else:
