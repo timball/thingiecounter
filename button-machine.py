@@ -11,9 +11,6 @@ import local_settings as conf
 from gpiozero import LED, PWMLED, Button
 from signal import pause
 
-# Base url for thingiecounter api
-URL = conf.URL
-
 
 def put_curry(endpt):
     """ put_curry -- curry function to make the .when_released even easier
@@ -25,8 +22,7 @@ def put_curry(endpt):
         import urllib2
         import json
 
-        # print ("decorating function w/ arg: %s" % (endpt))
-        url = URL + endpt
+        url = conf.URL + endpt
         opener = urllib2.build_opener(urllib2.HTTPHandler)
         request = urllib2.Request(url)
         request.add_header('Content-Type', 'application/json')
