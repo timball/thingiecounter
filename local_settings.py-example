@@ -3,9 +3,11 @@ URL = "https://some-host-running/thingie/"
 
 # auth header name
 AUTH_HDR = "change-me-super-custom-auth-header-name-change-me"
-
 # auth header sekrit -- change this or everyone will laugh at you
 AUTH_SEKRIT = "imalittleteapotshortandstouthereismyhandleandhereismyspout"
+
+# maxium Thingie name length
+MAX_THINGIE_NAME_LENGTH = 64
 
 # where the sqlite db is
 DBFILE = "thingie.sqlite"
