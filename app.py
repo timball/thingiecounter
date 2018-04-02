@@ -83,6 +83,12 @@ def tally():
     return jsonify(ans)
 
 
+def check_auth(auth):
+    if (auth != conf.AUTH_SEKRIT):
+        raise APIError('Say ‘friend’ and enter.', status_code=401)
+    return True
+
+
 @app.route("/<thing>", methods=["PUT", "DELETE", "PURGE"])
 def manipulate_thingie(thing):
     """ manipulate_thingie -- either
@@ -103,8 +109,10 @@ def manipulate_thingie(thing):
         count = r.all()[0].count
 
         if (request.method == "PURGE"):
+            check_auth(request.headers.get(conf.AUTH_HDR))
             thing.count = 0
         elif (request.method == "DELETE"):
+            check_auth(request.headers.get(conf.AUTH_HDR))
             db.session.delete(thing)
         elif (request.method == "PUT"):
             thing.count = count + 1
@@ -121,6 +129,7 @@ def manipulate_thingie(thing):
             db.session.commit()
             ret = thing_schema.jsonify(thing)
         elif (request.method == "PURGE" or request.method == "DELETE"):
+            check_auth(request.headers.get(conf.AUTH_HDR))
             raise APIError("%s does not exist to %s" % (thing, request.method), status_code=409)
         else:
             raise APIError("%s doesn't make sense for %s" % (thing, request.method), status_code=409)
