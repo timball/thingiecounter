@@ -9,7 +9,7 @@ Jinja2
 MarkupSafe
 marshmallow
 marshmallow-sqlalchemy
-pytz==2018.3
+pytz==2019.1
 six
 SQLAlchemy
 Werkzeug
